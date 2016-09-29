@@ -1,0 +1,26 @@
+#!/usr/bin/env ruby
+require 'sql_tracker/report'
+require 'json'
+
+reports = []
+until ARGV.empty?
+  begin
+    file = ARGV.pop
+    report = SqlTracker::Report.new(JSON.load(IO.binread(file)))
+    if report.valid?
+      reports << report
+    else
+      STDOUT.puts "Skip incompatible file: #{file}"
+    end
+  rescue => e
+    STDERR.puts "Error when parsing #{file}: #{e.inspect}"
+  end
+end
+
+if reports.empty?
+  STDERR.puts 'Unable to find sql_tracker json dump to generate report'
+  exit
+end
+
+report = reports.inject(:+)
+report.print_text
