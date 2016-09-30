@@ -1,5 +1,6 @@
 # Rails SQL Query Tracker
 
+[![Code Climate](https://codeclimate.com/github/steventen/sql_tracker/badges/gpa.svg)](https://codeclimate.com/github/steventen/sql_tracker)
 [![Build Status](https://travis-ci.org/steventen/sql_tracker.svg?branch=master)](https://travis-ci.org/steventen/sql_tracker)
 
 `sql_tracker` tracks SQL queries by subscribing to Rails' `sql.active_record` event notifications.
