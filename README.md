@@ -1,5 +1,7 @@
 # Rails SQL Query Tracker
 
+[![Build Status](https://travis-ci.org/steventen/sql_tracker.svg?branch=master)](https://travis-ci.org/steventen/sql_tracker)
+
 `sql_tracker` tracks SQL queries by subscribing to Rails' `sql.active_record` event notifications.
 
 It then aggregates and generates report to give you insights about all the sql queries happened in your Rails application.
