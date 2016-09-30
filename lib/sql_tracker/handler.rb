@@ -11,8 +11,9 @@ module SqlTracker
     end
 
     def call(name, started, finished, id, payload)
-      sql = payload[:sql]
+      return unless @config.enabled
 
+      sql = payload[:sql]
       return unless sql.start_with?(*@config.tracked_sql_command)
 
       cleaned_trace = clean_trace(caller)
