@@ -34,6 +34,16 @@ To generate report, run
 sql_tracker tmp/sql_tracker-*.json
 ```
 
+## Configurations
+
+All the configurable variables and their defaults are list below:
+```ruby
+SqlTracker::Config.enabled = true
+SqlTracker::Config.tracked_paths = %w(app lib)
+SqlTracker::Config.tracked_sql_command = %w(SELECT INSERT UPDATE DELETE)
+SqlTracker::Config.output_path = File.join(Rails.root.to_s, 'tmp')
+```
+
 ## License
 
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
