@@ -10,7 +10,13 @@ module SqlTracker
         self.enabled = enabled.nil? ? true : enabled
         self.tracked_paths ||= %w(app lib)
         self.tracked_sql_command ||= %w(SELECT INSERT UPDATE DELETE)
-        self.output_path ||= File.join(Rails.root.to_s, 'tmp')
+        self.output_path ||= begin
+          if defined?(::Rails) && ::Rails.root
+            File.join(::Rails.root.to_s, 'tmp')
+          else
+            'tmp'
+          end
+        end
         self
       end
     end
