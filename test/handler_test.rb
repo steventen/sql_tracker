@@ -1,6 +1,4 @@
 require 'test_helper'
-require 'active_support'
-require 'active_support/core_ext/string'
 
 module SqlTracker
   class HandlerTest < Minitest::Test
@@ -39,6 +37,27 @@ module SqlTracker
         (a.num > xxx AND a.num < xxx) AND
         (start_date >= xxx AND end_date <= xxx) AND
         a.total BETWEEN xxx AND xxx
+      }.squish
+
+      handler = SqlTracker::Handler.new(nil)
+      cleaned_query = handler.clean_sql_query(query)
+      assert_equal(expected, cleaned_query)
+    end
+
+    def test_clean_sql_query_is_case_insensitive
+      query = %{
+        SELECT * FROM a
+        where a.id = 1 AND a.uid != 'bbb'
+        (a.num > 1 AND a.num < 3) AND
+        (start_date >= '2010-01-01' AND end_date <= '2010-10-01') AND
+        a.total between 0 and 100
+      }
+      expected = %{
+        SELECT * FROM a
+        where a.id = xxx AND a.uid != xxx
+        (a.num > xxx AND a.num < xxx) AND
+        (start_date >= xxx AND end_date <= xxx) AND
+        a.total between xxx and xxx
       }.squish
 
       handler = SqlTracker::Handler.new(nil)

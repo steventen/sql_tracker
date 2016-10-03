@@ -14,7 +14,7 @@ module SqlTracker
       return unless @config.enabled
 
       sql = payload[:sql]
-      return unless sql.start_with?(*@config.tracked_sql_command)
+      return unless allowed_query_matcher =~ sql
 
       cleaned_trace = clean_trace(caller)
       return if cleaned_trace.empty?
@@ -30,11 +30,15 @@ module SqlTracker
       end
     end
 
+    def allowed_query_matcher
+      @allowed_query_matcher ||= /\A#{@config.tracked_sql_command.join('|')}/i
+    end
+
     def clean_sql_query(query)
       query.squish!
       query.gsub!(/(\s(=|>|<|>=|<=|<>|!=)\s)('[^']+'|\w+)/, '\1xxx')
-      query.gsub!(/(\sIN\s)\([^\(\)]+\)/, '\1(xxx)')
-      query.gsub!(/BETWEEN ('[^']+'|\w+) AND ('[^']+'|\w+)/, 'BETWEEN xxx AND xxx')
+      query.gsub!(/(\sIN\s)\([^\(\)]+\)/i, '\1(xxx)')
+      query.gsub!(/(\sBETWEEN\s)('[^']+'|\w+)(\sAND\s)('[^']+'|\w+)/i, '\1xxx\3xxx')
       query
     end
 
