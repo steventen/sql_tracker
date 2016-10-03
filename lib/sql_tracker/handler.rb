@@ -14,7 +14,7 @@ module SqlTracker
       return unless @config.enabled
 
       sql = payload[:sql]
-      return unless allowed_query_matcher =~ sql
+      return unless track?(sql)
 
       cleaned_trace = clean_trace(caller)
       return if cleaned_trace.empty?
@@ -30,8 +30,17 @@ module SqlTracker
       end
     end
 
-    def allowed_query_matcher
-      @allowed_query_matcher ||= /\A#{@config.tracked_sql_command.join('|')}/i
+    def track?(sql)
+      return true if config.tracked_sql_command.respond_to?(:join)
+      tracked_sql_matcher =~ sql
+    end
+
+    def tracked_sql_matcher
+      @tracked_sql_matcher ||= /\A#{@config.tracked_sql_command.join('|')}/i
+    end
+
+    def trace_path_matcher
+      @trace_path_matcher ||= %r{^(#{config.tracked_paths.join('|')})\/}
     end
 
     def clean_sql_query(query)
@@ -43,14 +52,20 @@ module SqlTracker
     end
 
     def clean_trace(trace)
+      return trace unless defined?(::Rails)
+
       if Rails.backtrace_cleaner.instance_variable_get(:@root) == '/'
         Rails.backtrace_cleaner.instance_variable_set :@root, Rails.root.to_s
       end
 
       Rails.backtrace_cleaner.remove_silencers!
-      Rails.backtrace_cleaner.add_silencer do |line|
-        line !~ %r{^(#{@config.tracked_paths.join('|')})\/}
+
+      unless config.tracked_paths.respond_to?(:join)
+        Rails.backtrace_cleaner.add_silencer do |line|
+          line !~ trace_path_matcher
+        end
       end
+
       Rails.backtrace_cleaner.clean(trace)
     end
 
