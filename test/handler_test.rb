@@ -39,7 +39,10 @@ module SqlTracker
     end
 
     def test_query_count_should_be_case_insensitive
-      handler = SqlTracker::Handler.new(sample_config)
+      config = sample_config
+      config.tracked_sql_command = %w(INSERT SELECT)
+
+      handler = SqlTracker::Handler.new(config)
 
       queries = [
         'SELECT * FROM users',
