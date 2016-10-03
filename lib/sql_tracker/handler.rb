@@ -4,13 +4,15 @@ require 'fileutils'
 
 module SqlTracker
   class Handler
+    attr_reader :data
+
     def initialize(config)
       @config = config
       @started_at = Time.now.to_s
       @data = {} # {key: {sql:, count:, duration, source: []}, ...}
     end
 
-    def call(name, started, finished, id, payload)
+    def call(_name, started, finished, _id, payload)
       return unless @config.enabled
 
       sql = payload[:sql]
@@ -31,7 +33,7 @@ module SqlTracker
     end
 
     def track?(sql)
-      return true if config.tracked_sql_command.respond_to?(:join)
+      return true unless @config.tracked_sql_command.respond_to?(:join)
       tracked_sql_matcher =~ sql
     end
 
@@ -40,7 +42,7 @@ module SqlTracker
     end
 
     def trace_path_matcher
-      @trace_path_matcher ||= %r{^(#{config.tracked_paths.join('|')})\/}
+      @trace_path_matcher ||= %r{^(#{@config.tracked_paths.join('|')})\/}
     end
 
     def clean_sql_query(query)
@@ -60,7 +62,7 @@ module SqlTracker
 
       Rails.backtrace_cleaner.remove_silencers!
 
-      unless config.tracked_paths.respond_to?(:join)
+      if config.tracked_paths.respond_to?(:join)
         Rails.backtrace_cleaner.add_silencer do |line|
           line !~ trace_path_matcher
         end
