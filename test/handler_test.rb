@@ -2,6 +2,59 @@ require 'test_helper'
 
 module SqlTracker
   class HandlerTest < Minitest::Test
+    def test_should_track_sql_command_in_the_list
+      config = sample_config
+      config.tracked_sql_command = %w(SELECT)
+      config.tracked_paths = nil
+      handler = SqlTracker::Handler.new(config)
+
+      queries = [
+        'SELECT * FROM users',
+        'select id from products'
+      ]
+
+      queries.each_with_index do |query, i|
+        payload = { sql: query }
+        handler.call('xxx', Time.now.to_f, Time.now.to_f, 1, payload)
+        assert_equal(i + 1, handler.data.keys.count)
+      end
+    end
+
+    def test_should_not_track_sql_command_not_in_the_list
+      config = sample_config
+      config.tracked_sql_command = %w(INSERT)
+      config.tracked_paths = nil
+      handler = SqlTracker::Handler.new(config)
+
+      queries = [
+        'SELECT * FROM users',
+        'select id from products'
+      ]
+
+      queries.each do |query|
+        payload = { sql: query }
+        handler.call('xxx', Time.now.to_f, Time.now.to_f, 1, payload)
+        assert_equal(0, handler.data.keys.count)
+      end
+    end
+
+    def test_query_count_should_be_case_insensitive
+      handler = SqlTracker::Handler.new(sample_config)
+
+      queries = [
+        'SELECT * FROM users',
+        'select * from Users'
+      ]
+
+      queries.each do |query|
+        payload = { sql: query }
+        handler.call('xxx', Time.now.to_f, Time.now.to_f, 1, payload)
+      end
+
+      assert_equal(1, handler.data.keys.count)
+      assert_equal(2, handler.data[handler.data.keys.first][:count])
+    end
+
     def test_clean_values_from_where_in_clause
       query = %{
         SELECT * FROM a
@@ -63,6 +116,14 @@ module SqlTracker
       handler = SqlTracker::Handler.new(nil)
       cleaned_query = handler.clean_sql_query(query)
       assert_equal(expected, cleaned_query)
+    end
+
+    private
+
+    def sample_config
+      config = SqlTracker::Config.apply_defaults
+      config.enabled = true
+      config
     end
   end
 end
