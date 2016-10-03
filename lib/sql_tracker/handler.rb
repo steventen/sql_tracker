@@ -21,7 +21,7 @@ module SqlTracker
 
       sql = clean_sql_query(sql)
       duration = 1000.0 * (finished - started) # in milliseconds
-      sql_key = Digest::MD5.hexdigest(sql)
+      sql_key = Digest::MD5.hexdigest(sql.downcase)
 
       if @data.key?(sql_key)
         update_data(sql_key, cleaned_trace, duration)
