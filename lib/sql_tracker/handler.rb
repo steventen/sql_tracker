@@ -62,7 +62,7 @@ module SqlTracker
 
       Rails.backtrace_cleaner.remove_silencers!
 
-      if config.tracked_paths.respond_to?(:join)
+      if @config.tracked_paths.respond_to?(:join)
         Rails.backtrace_cleaner.add_silencer do |line|
           line !~ trace_path_matcher
         end
