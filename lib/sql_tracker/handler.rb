@@ -49,7 +49,11 @@ module SqlTracker
       query.squish!
       query.gsub!(/(\s(=|>|<|>=|<=|<>|!=)\s)('[^']+'|[\+\-\w\.]+)/, '\1xxx')
       query.gsub!(/(\sIN\s)\([^\(\)]+\)/i, '\1(xxx)')
-      query.gsub!(/(\sBETWEEN\s)('[^']+'|[\+\-\w\.]+)(\sAND\s)('[^']+'|[\+\-\w\.]+)/i, '\1xxx\3xxx')
+      query.gsub!(
+        /(\sBETWEEN\s)('[^']+'|[\+\-\w\.]+)(\sAND\s)('[^']+'|[\+\-\w\.]+)/i,
+        '\1xxx\3xxx'
+      )
+      query.gsub!(/(\s(LIMIT|OFFSET)\s)(\d+)/i, '\1xxx')
       query
     end
 

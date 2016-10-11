@@ -85,14 +85,14 @@ module SqlTracker
         WHERE a.id = 1 AND a.uid != 'bbb'
         (a.num > 1 AND a.num < 3) AND
         (start_date >= '2010-01-01' AND end_date <= '2010-10-01') AND
-        a.total BETWEEN 0 AND 100
+        a.total BETWEEN 0 AND 100 LIMIT 25 OFFSET 0
       }
       expected = %{
         SELECT * FROM a
         WHERE a.id = xxx AND a.uid != xxx
         (a.num > xxx AND a.num < xxx) AND
         (start_date >= xxx AND end_date <= xxx) AND
-        a.total BETWEEN xxx AND xxx
+        a.total BETWEEN xxx AND xxx LIMIT xxx OFFSET xxx
       }.squish
 
       handler = SqlTracker::Handler.new(nil)
