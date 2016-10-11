@@ -47,7 +47,7 @@ module SqlTracker
 
     def clean_sql_query(query)
       query.squish!
-      query.gsub!(/(\s(=|>|<|>=|<=|<>|!=)\s)('[^']+'|[\+\-\w\.]+)/, '\1xxx')
+      query.gsub!(/(\s(=|>|<|>=|<=|<>|!=)\s)('[^']+'|[\$\+\-\w\.]+)/, '\1xxx')
       query.gsub!(/(\sIN\s)\([^\(\)]+\)/i, '\1(xxx)')
       query.gsub!(
         /(\sBETWEEN\s)('[^']+'|[\+\-\w\.]+)(\sAND\s)('[^']+'|[\+\-\w\.]+)/i,
