@@ -100,6 +100,23 @@ module SqlTracker
       assert_equal(expected, cleaned_query)
     end
 
+    def test_clean_floating_numbers
+      query = %{
+        SELECT * FROM a
+        WHERE (a.lat BETWEEN 12.4567 AND 38.0678) AND
+        (a.lng BETWEEN -70.487 AND -87.790)
+      }
+      expected = %{
+        SELECT * FROM a
+        WHERE (a.lat BETWEEN xxx AND xxx) AND
+        (a.lng BETWEEN xxx AND xxx)
+      }.squish
+
+      handler = SqlTracker::Handler.new(nil)
+      cleaned_query = handler.clean_sql_query(query)
+      assert_equal(expected, cleaned_query)
+    end
+
     def test_clean_sql_query_is_case_insensitive
       query = %{
         SELECT * FROM a
