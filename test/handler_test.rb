@@ -138,6 +138,36 @@ module SqlTracker
       assert_equal(expected, cleaned_query)
     end
 
+    def test_clean_values
+      query = %{
+        INSERT INTO users VALUES
+        (nextval('id_seq'), 'a', 105, DEFAULT),
+        (nextval('id_seq'), 'b', 9100, DEFAULT);
+      }
+      expected = %{
+        INSERT INTO users VALUES (xxx);
+      }.squish
+
+      handler = SqlTracker::Handler.new(nil)
+      cleaned_query = handler.clean_sql_query(query)
+      assert_equal(expected, cleaned_query)
+    end
+
+    def test_clean_pattern_matching
+      query = %(
+        SELECT users.* FROM users
+        WHERE users.name LIKE '%test%' AND NOT SIMILAR TO '%test ppp'
+      )
+      expected = %(
+        SELECT users.* FROM users
+        WHERE users.name LIKE xxx AND NOT SIMILAR TO xxx
+      ).squish
+
+      handler = SqlTracker::Handler.new(nil)
+      cleaned_query = handler.clean_sql_query(query)
+      assert_equal(expected, cleaned_query)
+    end
+
     private
 
     def sample_config
