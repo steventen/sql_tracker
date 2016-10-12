@@ -36,6 +36,28 @@ To generate report, run
 ```bash
 sql_tracker tmp/sql_tracker-*.json
 ```
+The output report looks like this:
+```
+==================================
+Total Unique SQL Queries: 24
+==================================
+Count | Avg Time (ms)   | SQL Query                                                                                                 | Source
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+8     | 0.33            | SELECT `users`.* FROM `users` WHERE `users`.`id` = xxx LIMIT 1                                            | app/controllers/users_controller.rb:125:in `create'
+      |                 |                                                                                                           | app/controllers/projects_controller.rb:9:in `block in update'
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+4     | 0.27            | SELECT `projects`.* FROM `projects` WHERE `projects`.`user_id` = xxx AND `projects`.`id` = xxx LIMIT 1    | app/controllers/projects_controller.rb:4:in `update'
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+2     | 0.27            | UPDATE `projects` SET `updated_at` = xxx WHERE `projects`.`id` = xxx                                      | app/controllers/projects_controller.rb:9:in `block in update'
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+2     | 1.76            | SELECT projects.* FROM projects WHERE projects.priority BETWEEN xxx AND xxx ORDER BY created_at DESC      | app/controllers/projects_controller.rb:35:in `index'
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+... ...
+```
+By default, the report will be sorted by the total count of each query, you can also choose to sort it by average duration:
+```bash
+sql_tracker tmp/sql_tracker-*.json --sort-by=duration
+```
 
 ## Configurations
 
