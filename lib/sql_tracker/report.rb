@@ -25,7 +25,8 @@ module SqlTracker
       raw_data['data']
     end
 
-    def print_text(f = STDOUT)
+    def print_text(options)
+      f = STDOUT
       f.puts '=================================='
       f.puts "Total Unique SQL Queries: #{data.keys.size}"
       f.puts '=================================='
@@ -35,7 +36,8 @@ module SqlTracker
       )
       f.puts '-' * terminal_width
 
-      data.values.sort_by { |d| -d['count'] }.each do |row|
+      sorted_data = sort_data(data.values, options[:sort_by])
+      sorted_data.each do |row|
         chopped_sql = wrap_text(row['sql'], sql_width)
         source_list = wrap_list(row['source'].uniq, sql_width - 10)
         avg_duration = row['duration'].to_f / row['count']
@@ -50,12 +52,23 @@ module SqlTracker
           duration = line == 0 ? avg_duration.round(2) : ''
           source = source_list.length > line ? source_list[line] : ''
           query = row['sql'].length > line ? chopped_sql[line] : ''
-          f.printf(
-            "%-#{count_width}s | %-#{duration_width}s | %-#{sql_width}s | %-#{sql_width}s\n",
-            count, duration, query, source
-          )
+          f.printf(row_format, count, duration, query, source)
         end
         f.puts '-' * terminal_width
+      end
+    end
+
+    def row_format
+      "%-#{count_width}s | %-#{duration_width}s | %-#{sql_width}s | %-#{sql_width}s\n"
+    end
+
+    def sort_data(data, sort_by)
+      data.sort_by do |d|
+        if sort_by == 'duration'
+          -d['duration'].to_f / d['count']
+        else
+          -d['count']
+        end
       end
     end
 

@@ -1,6 +1,24 @@
 #!/usr/bin/env ruby
 require 'sql_tracker/report'
 require 'json'
+require 'optparse'
+
+options = {}
+
+parser = OptionParser.new(ARGV) do |o|
+  o.banner = 'Usage: sql_tracker [file.json]+ [--sort-by=COLUMN]'
+
+  o.on('-s', '--sort-by COLUMN', 'The name of column that is used for sorting the table. Options: count, duration') do |arg|
+    options[:sort_by] = arg if %(count duration).include?(arg)
+  end
+end
+
+parser.parse!
+parser.abort(parser.help) if ARGV.empty?
+
+default_options = { sort_by: 'count' }
+
+options = default_options.merge(options)
 
 reports = []
 until ARGV.empty?
@@ -23,4 +41,4 @@ if reports.empty?
 end
 
 report = reports.inject(:+)
-report.print_text
+report.print_text(options)
