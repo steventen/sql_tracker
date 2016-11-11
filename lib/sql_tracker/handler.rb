@@ -15,7 +15,7 @@ module SqlTracker
     def call(_name, started, finished, _id, payload)
       return unless @config.enabled
 
-      sql = payload[:sql]
+      sql = payload[:sql].dup
       return unless track?(sql)
 
       cleaned_trace = clean_trace(caller)
