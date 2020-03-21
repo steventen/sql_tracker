@@ -20,8 +20,8 @@ module SqlTracker
       instrument_query('SELECT * FROM comments')
 
       assert_equal(
-        query_data.values.map { |v| v[:sql] },
-        expected_queries
+        expected_queries,
+        query_data.values.map { |v| v[:sql] }
       )
     end
 

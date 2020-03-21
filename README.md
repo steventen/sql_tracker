@@ -29,6 +29,24 @@ To start tracking, simply start your rails application server. When your server 
 
 `sql_tracker` can also track sql queries when running rails tests (e.g. your controller or integration tests), it will dump the data after all the tests are finished.
 
+### Tracking Using a Block
+
+It is also possible to track queries executed within a block. This method uses a new subscriber to `sql.active_record` event notifications for each invocation. Results using this method are not saved to a file.
+
+```ruby
+query_data = SqlTracker.track do
+  # Run some active record queries
+end
+
+query_data.values
+# =>
+# [{
+#  :sql=>"SELECT * FROM users",
+#  :count=>1,
+#  :duration=>1.0,
+#  :source=>["app/models/user.rb:12"]
+# }]
+```
 
 ## Reporting
 
