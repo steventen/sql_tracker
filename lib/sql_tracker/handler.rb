@@ -12,6 +12,21 @@ module SqlTracker
       @data = {} # {key: {sql:, count:, duration, source: []}, ...}
     end
 
+    def subscribe
+      @subscription ||= ActiveSupport::Notifications.subscribe(
+        'sql.active_record',
+        self
+      )
+    end
+
+    def unsubscribe
+      return unless @subscription
+
+      ActiveSupport::Notifications.unsubscribe(@subscription)
+
+      @subscription = nil
+    end
+
     def call(_name, started, finished, _id, payload)
       return unless @config.enabled
 

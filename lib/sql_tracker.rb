@@ -8,10 +8,19 @@ module SqlTracker
 
     config = SqlTracker::Config.apply_defaults
     handler = SqlTracker::Handler.new(config)
-    ActiveSupport::Notifications.subscribe('sql.active_record', handler)
+    handler.subscribe
     @already_initialized = true
 
     at_exit { handler.save }
+  end
+
+  def self.track
+    config = SqlTracker::Config.apply_defaults
+    handler = SqlTracker::Handler.new(config)
+    handler.subscribe
+    yield
+    handler.unsubscribe
+    handler.data
   end
 end
 
