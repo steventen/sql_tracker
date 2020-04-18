@@ -1,6 +1,7 @@
 module SqlTracker
   class Report
     attr_accessor :raw_data
+    attr_accessor :terminal_width
 
     def initialize(data)
       self.raw_data = data
@@ -26,6 +27,7 @@ module SqlTracker
     end
 
     def print_text(options)
+      self.terminal_width = options.fetch(:terminal_width)
       f = STDOUT
       f.puts '=================================='
       f.puts "Total Unique SQL Queries: #{data.keys.size}"
@@ -124,30 +126,6 @@ module SqlTracker
 
     def duration_width
       15
-    end
-
-    def terminal_width
-      @terminal_width ||= begin
-        result = unix? ? dynamic_width : 80
-        result < 10 ? 80 : result
-      end
-    end
-
-    def dynamic_width
-      @dynamic_width ||= (dynamic_width_stty.nonzero? || dynamic_width_tput)
-    end
-
-    def dynamic_width_stty
-      `stty size 2>/dev/null`.split[1].to_i
-    end
-
-    def dynamic_width_tput
-      `tput cols 2>/dev/null`.to_i
-    end
-
-    def unix?
-      RUBY_PLATFORM =~
-        /(aix|darwin|linux|(net|free|open)bsd|cygwin|solaris|irix|hpux)/i
     end
   end
 end
