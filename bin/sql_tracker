@@ -1,9 +1,11 @@
 #!/usr/bin/env ruby
+require 'sql_tracker/terminal'
 require 'sql_tracker/report'
 require 'json'
 require 'optparse'
 
 options = {}
+default_options = { sort_by: 'count', terminal_width: SqlTracker::Terminal.width }
 
 parser = OptionParser.new(ARGV) do |o|
   o.banner = 'Usage: sql_tracker [file.json]+ [--sort-by=COLUMN]'
@@ -11,12 +13,17 @@ parser = OptionParser.new(ARGV) do |o|
   o.on('-s', '--sort-by COLUMN', 'The name of column that is used for sorting the table. Options: count, duration') do |arg|
     options[:sort_by] = arg if %(count duration).include?(arg)
   end
+
+  o.on('-w', '--terminal-width WIDTH', Integer,
+       "The width of the printed report. " \
+       "Default: #{default_options[:terminal_width]}. " \
+       "Minimum #{SqlTracker::Terminal::MIN_WIDTH}") do |arg|
+    options[:terminal_width] = arg if arg >= SqlTracker::Terminal::MIN_WIDTH
+  end
 end
 
 parser.parse!
 parser.abort(parser.help) if ARGV.empty?
-
-default_options = { sort_by: 'count' }
 
 options = default_options.merge(options)
 
