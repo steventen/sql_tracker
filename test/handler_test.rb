@@ -171,7 +171,7 @@ module SqlTracker
     private
 
     def sample_config
-      config = SqlTracker::Config.apply_defaults
+      config = SqlTracker::Config.apply_defaults.new
       config.enabled = true
       config
     end
