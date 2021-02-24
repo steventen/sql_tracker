@@ -1,6 +1,6 @@
 # This workflow will download a prebuilt Ruby version, install dependencies and run tests with Rake
 
-name: Ruby
+name: CI
 
 on:
   push:
