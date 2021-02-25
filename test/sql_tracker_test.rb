@@ -2,6 +2,10 @@ require 'test_helper'
 
 module SqlTracker
   class HandlerTest < Minitest::Test
+    def setup
+      reset_sql_tracker_options
+    end
+
     def test_tracking_queries_with_a_block
       SqlTracker::Config.tracked_sql_command = %w(SELECT INSERT)
 

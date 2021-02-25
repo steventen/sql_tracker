@@ -2,6 +2,10 @@ require 'test_helper'
 
 module SqlTracker
   class HandlerTest < Minitest::Test
+    def setup
+      reset_sql_tracker_options
+    end
+    
     def test_should_track_sql_command_in_the_list
       config = sample_config
       config.tracked_sql_command = %w(SELECT)

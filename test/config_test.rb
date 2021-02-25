@@ -2,6 +2,10 @@ require 'test_helper'
 
 module SqlTracker
   class ConfigTest < Minitest::Test
+    def setup
+      reset_sql_tracker_options
+    end
+
     def test_defaults_should_not_overwrite_user_configs
       SqlTracker::Config.enabled = false
       SqlTracker::Config.tracked_paths = %w(app/model)
