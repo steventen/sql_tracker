@@ -15,7 +15,8 @@ module SqlTracker
   end
 
   def self.track
-    config = SqlTracker::Config.apply_defaults
+    config = SqlTracker::Config.apply_defaults.new
+    config.enabled = true
     handler = SqlTracker::Handler.new(config)
     handler.subscribe
     yield
