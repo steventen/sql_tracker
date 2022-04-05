@@ -3,7 +3,7 @@ require 'active_support/configurable'
 module SqlTracker
   class Config
     include ActiveSupport::Configurable
-    config_accessor :tracked_paths, :tracked_sql_command, :output_path, :enabled
+    config_accessor :tracked_paths, :tracked_sql_command, :output_path, :enabled, :retain_sql_query_ids
 
     class << self
       def apply_defaults
@@ -17,6 +17,7 @@ module SqlTracker
             'tmp'
           end
         end
+        self.retain_sql_query_ids ||= false
         self
       end
     end
