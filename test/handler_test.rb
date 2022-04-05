@@ -157,6 +157,23 @@ module SqlTracker
       assert_equal(expected, cleaned_query)
     end
 
+    def test_not_clean_values_due_to_config
+      query = %{
+        INSERT INTO users VALUES
+        (nextval('id_seq'), 'a', 105, DEFAULT),
+        (nextval('id_seq'), 'b', 9100, DEFAULT);
+      }
+      expected = %{
+        INSERT INTO users VALUES (nextval('id_seq'), 'a', 105, DEFAULT), (nextval('id_seq'), 'b', 9100, DEFAULT);
+      }.squish
+
+      config = sample_config
+      config.retain_sql_query_ids = true
+      handler = SqlTracker::Handler.new(config)
+      returned_query = handler.clean_sql_query(query)
+      assert_equal(expected, returned_query)
+    end
+
     def test_clean_pattern_matching
       query = %(
         SELECT users.* FROM users
